@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./docker/wordpress
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    volumes:
+      - ./wordpress_data:/var/www/html
+    restart: always
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data-wordpress:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: wp-admin 
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+
+volumes:
+  db_data-wordpress:
